@@ -1,0 +1,6 @@
+alert tcp any any -> 10.0.0.2 443 (msg:"TCP SYN Flooding attack detected"; flags:S; threshold:type threshold, track by_dst, count 10, seconds 30; sid:1000004; rev:1;)
+
+alert udp any any -> 10.0.0.1 8080 (sid:1000008; rev:1; msg:"UDP flooding attack"; dsize:0;detection_filter: track by_dst, count 10, seconds 30;)
+
+alert icmp any any -> any any (msg:"ICMP flood attack detected"; sid:1000003; rev:1; classtype:icmp-event; detection_filter:track by_dst, count 10, seconds 30;)
+
