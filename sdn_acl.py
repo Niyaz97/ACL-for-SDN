@@ -265,7 +265,8 @@ class Firewall(app_manager.RyuApp):
                     else:
                         out_port = datapath.ofproto.OFPP_FLOOD
         except Exception as err:
-            self.info(err.message)
+            self.logger.exception("port_learn failed")
+            # Fall back to flooding the packet when learning fails
             out_port = datapath.ofproto.OFPP_FLOOD
         finally:
             return out_port
