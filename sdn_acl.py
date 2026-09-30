@@ -116,7 +116,7 @@ class Firewall(app_manager.RyuApp):
                     flag1 = 0
                     icmp_objectb = pkt.get_protocol(icmp.icmp)
                     
-                    if (icmp_objectb.type == ICMP_PING) and self.inner_policy.has_key(ip_object.src):
+                    if (icmp_objectb.type == ICMP_PING) and ip_object.src in self.inner_policy:
                         temp = self.inner_policy.get(ip_object.src)
                         for i in range(0,len(temp)):
                             if temp[i][0] == ip_object.dst:
@@ -128,7 +128,7 @@ class Firewall(app_manager.RyuApp):
                                     self.logger.info("%s  ->  %s : ECHO REQUEST ALLOWED" % (ip_object.src,ip_object.dst))
                                     break
 
-                    elif (icmp_objectb.type == ICMP_PONG) and (self.icmp_conn_track.has_key(ip_object.src)):
+                    elif (icmp_objectb.type == ICMP_PONG) and ip_object.src in (self.icmp_conn_track):
                         temp2 = self.icmp_conn_track.get(ip_object.src)
                         for i in range(0,len(temp2)): 
                             if temp2[i][0] == ip_object.dst:
@@ -149,7 +149,7 @@ class Firewall(app_manager.RyuApp):
                     flag2 = 0
 
                     if ((tcp_object.bits & TCP_SYN) == TCP_SYN) & ((tcp_object.bits & TCP_FLAG) == 0x00):
-                        if self.inner_policy.has_key(ip_object.src):
+                        if ip_object.src in self.inner_policy:
                             temp = self.inner_policy.get(ip_object.src)
                             for i in range(0,len(temp)):
                                 if (temp[i][0] == ip_object.dst) and (temp[i][1] == 'TCP') and (int(temp[i][2]) == tcp_object.src_port) and (int(temp[i][3]) == tcp_object.dst_port)  and  (temp[i][5] == 'ALLOW'):
@@ -160,7 +160,7 @@ class Firewall(app_manager.RyuApp):
                                     break
                     
                     elif (tcp_object.bits & TCP_SYNACK) == TCP_SYNACK:
-                        if self.tcp_conn_track.has_key(ip_object.dst):
+                        if ip_object.dst in self.tcp_conn_track:
                             temp2 = self.tcp_conn_track.get(ip_object.dst)
                             for i in range(0,len(temp2)):
                                 if (temp2[i][0] == ip_object.src) and (int(temp2[i][1]) == tcp_object.dst_port) and (int(temp2[i][2]) == tcp_object.src_port):
@@ -172,7 +172,7 @@ class Firewall(app_manager.RyuApp):
                                     break
                     
                     else:
-                        if self.tcp_conn_track.has_key(ip_object.src):
+                        if ip_object.src in self.tcp_conn_track:
                             temp3 = self.tcp_conn_track.get(ip_object.src)
                             for i in range(0,len(temp3)):
                                 if ((temp3[i][0] == ip_object.dst) and (int(temp3[i][1]) == tcp_object.src_port) and (int(temp3[i][2]) == tcp_object.dst_port)):
@@ -188,7 +188,7 @@ class Firewall(app_manager.RyuApp):
                 elif ip_object.proto == IPPROTO_UDP:
                     flag3 = 0 
                     udp_object = pkt.get_protocol(udp.udp)
-                    if self.udp_conn_track.has_key(ip_object.dst):
+                    if ip_object.dst in self.udp_conn_track:
                         tmp_tpl = self.udp_conn_track.get(ip_object.dst)
                         tmp = list(tmp_tpl)
                         for i in range(0,len(tmp)):
@@ -207,7 +207,7 @@ class Firewall(app_manager.RyuApp):
                         else:
                             self.udp_conn_track.pop(ip_object.dst,None)
                             
-                    elif self.inner_policy.has_key(ip_object.src):
+                    elif ip_object.src in self.inner_policy:
                         temp = self.inner_policy.get(ip_object.src)
                         for i in range(0,len(temp)):
                             if temp[i][0] == ip_object.dst:
@@ -287,7 +287,7 @@ class ParseRules:
 
             list1.append(lines[i].split(','))
             list2 = copy.deepcopy(list1)
-            if firewall_dict.has_key(str(list2[i][0])) is False:
+            if str(list2[i][0] in firewall_dict) is False:
                 key = str(list2[i][0])
                 list2[i].remove(key)
                 tup = tuple(list2[i])
@@ -295,7 +295,7 @@ class ParseRules:
                 tup = tuple(listobj)
                 firewall_dict[key] = tup
 
-            elif firewall_dict.has_key(str(list2[i][0])) is True:
+            elif str(list2[i][0] in firewall_dict) is True:
                 key = str(list2[i][0])
                 dst = firewall_dict[key]
                 dst = list(dst)

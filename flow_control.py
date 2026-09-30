@@ -167,7 +167,7 @@ class TrackConnection:
         list1 = [d_ip, s_port, d_port, act]
         listobj = []
         # Add new flow entries
-        if mydict.has_key(src_ip) is False:
+        if src_ip not in mydict:
             key = src_ip
             tup = tuple(list1)
             listobj.append(tup)
@@ -176,7 +176,7 @@ class TrackConnection:
             flag = 1
 
         # Check if an entry already exists
-        elif mydict.has_key(src_ip) is True:
+        elif src_ip in mydict:
             for x in list(mydict[src_ip]):
                 if list1 == list(x):
                     flag = 1
